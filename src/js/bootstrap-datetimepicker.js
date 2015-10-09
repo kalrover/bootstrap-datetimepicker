@@ -842,7 +842,7 @@
                 fillTime();
             },
 
-            setValue = function (targetMoment) {
+            setValue = function (targetMoment, hideDefaultDate) {
                 var oldDate = unset ? null : date;
 
                 // case of calling setValue(null or false)
@@ -868,7 +868,9 @@
                 if (isValid(targetMoment)) {
                     date = targetMoment;
                     viewDate = date.clone();
-                    input.val(date.format(actualFormat));
+                    if (!hideDefaultDate) {
+                        input.val(date.format(actualFormat));
+                    }
                     element.data('date', date.format(actualFormat));
                     unset = false;
                     update();
@@ -1402,7 +1404,7 @@
                 currentViewMode = Math.max(minViewModeNumber, currentViewMode);
 
                 if (!unset) {
-                    setValue(date);
+                    setValue(date, options.hideDefaultDate);
                 }
             };
 
@@ -1762,10 +1764,15 @@
             options.defaultDate = parsedDate;
 
             if ((options.defaultDate && options.inline) || input.val().trim() === '') {
-                setValue(options.defaultDate);
+                setValue(options.defaultDate, options.hideDefaultDate);
             }
             return picker;
         };
+
+        picker.hideDefaultDate = function (hideDefaultDate) {
+            options.hideDefaultDate = hideDefaultDate;
+            return picker;
+        }
 
         picker.locale = function (locale) {
             if (arguments.length === 0) {
@@ -2341,7 +2348,7 @@
             setValue(parseInputDate(input.val().trim()));
         }
         else if (options.defaultDate && input.attr('placeholder') === undefined) {
-            setValue(options.defaultDate);
+            setValue(options.defaultDate, options.hideDefaultDate);
         }
         if (options.inline) {
             show();
@@ -2378,6 +2385,7 @@
         collapse: true,
         locale: moment.locale(),
         defaultDate: false,
+        hideDefaultDate: false,
         disabledDates: false,
         enabledDates: false,
         icons: {
